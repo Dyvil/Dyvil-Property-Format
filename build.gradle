@@ -1,0 +1,44 @@
+plugins {
+	id 'java'
+	id 'idea'
+	id 'maven-publish'
+	id 'com.jfrog.bintray' version '1.8.4'
+	id 'de.clashsoft.simple-publish' version '0.3.0'
+	id 'org.dyvil.dyvil-gradle' version '0.2.0'
+}
+
+group = 'org.dyvil'
+version = '0.16.2'
+description = 'The Dyvil Property Format library'
+
+publishInfo {
+	organization = 'dyvil'
+	websiteUrl = 'https://github.com/Dyvil/Dyvil-Property-Format'
+	issueTrackerUrl = 'https://github.com/Dyvil/Dyvil-Property-Format/issues'
+	vcsUrl = 'https://github.com/Dyvil/Dyvil-Property-Format'
+	githubRepo = 'Dyvil/Dyvil-Property-Format'
+
+	license {
+		shortName = 'BSD 3-Clause'
+		longName = 'BSD 3-Clause "New" or "Revised" License'
+		url = 'https://opensource.org/licenses/BSD-3-Clause'
+	}
+
+	developer {
+		id = 'clashsoft'
+		name = 'Adrian Kunz'
+		email = 'clashsoft@hotmail.com'
+	}
+}
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+	dyvilc group: 'org.dyvil', name: 'compiler', version: '0.45.0'
+	gensrc group: 'org.dyvil', name: 'gensrc', version: '0.9.6'
+
+	compile group: 'org.dyvil', name: 'library', version: '0.45.0'
+}
