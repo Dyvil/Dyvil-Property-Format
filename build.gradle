@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'org.dyvil'
-version = '0.16.2'
+version = '0.16.3'
 description = 'The Dyvil Property Format library'
 
 publishInfo {
@@ -39,7 +39,7 @@ repositories {
 dependencies {
 	// https://mvnrepository.com/artifact/org.dyvil/compiler
 	dyvilc group: 'org.dyvil', name: 'compiler', version: '0.45.0'
-	
+
 	// https://mvnrepository.com/artifact/org.dyvil/gensrc
 	gensrc group: 'org.dyvil', name: 'gensrc', version: '0.9.6'
 
