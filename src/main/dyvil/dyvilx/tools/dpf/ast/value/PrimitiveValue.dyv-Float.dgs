@@ -1,0 +1,4 @@
+@fileName=FloatValue.dyv
+TYPE_NAME=Float
+PRIMITIVE=float
+LITERAL_SUFFIX=F

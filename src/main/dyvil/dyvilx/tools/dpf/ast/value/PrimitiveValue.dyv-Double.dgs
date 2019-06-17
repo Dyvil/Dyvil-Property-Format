@@ -1,0 +1,4 @@
+@fileName=DoubleValue.dyv
+TYPE_NAME=Double
+PRIMITIVE=double
+LITERAL_SUFFIX=D

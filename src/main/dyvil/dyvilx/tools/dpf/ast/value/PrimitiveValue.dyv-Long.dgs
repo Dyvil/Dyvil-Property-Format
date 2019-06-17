@@ -1,0 +1,4 @@
+@fileName=LongValue.dyv
+TYPE_NAME=Long
+PRIMITIVE=long
+LITERAL_SUFFIX=L
