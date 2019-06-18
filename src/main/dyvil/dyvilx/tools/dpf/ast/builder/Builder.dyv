@@ -37,7 +37,9 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	override func visitNode() -> Node
 	{
-		if (this.node != null) return this.node!!
+		if let node = this.node {
+			return node
+		}
 		return this.node = new Node(this.name)
 	}
 

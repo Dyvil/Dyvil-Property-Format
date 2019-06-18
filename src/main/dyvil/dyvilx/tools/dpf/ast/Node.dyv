@@ -51,9 +51,9 @@ public class Node(
 
 	internal func acceptBody(nodeVisitor: NodeVisitor) -> void
 	{
-		for (element <- this.properties) element.accept(nodeVisitor)
-		for (node <- this.nodes) node.accept(nodeVisitor)
-		for (nodeAccess <- this.nodeAccesses) nodeAccess.accept(nodeVisitor)
+		for (element <- this.properties) { element.accept(nodeVisitor) }
+		for (node <- this.nodes) { node.accept(nodeVisitor) }
+		for (nodeAccess <- this.nodeAccesses) { nodeAccess.accept(nodeVisitor) }
 		nodeVisitor.visitEnd()
 	}
 
@@ -74,9 +74,9 @@ public class Node(
 
 	protected func expandChildren(mappings: Map<String, Object>) -> void
 	{
-		for (node <- this.nodes) node.expand(mappings, true)
-		for (property <- this.properties) property.expand(mappings, true)
-		for (nodeAccess <- this.nodeAccesses) nodeAccess.expand(mappings, true)
+		for (node <- this.nodes) { node.expand(mappings, true) }
+		for (property <- this.properties) { property.expand(mappings, true) }
+		for (nodeAccess <- this.nodeAccesses) { nodeAccess.expand(mappings, true) }
 	}
 
 	protected func expand(node: Node, mappings: Map<String, Object>) -> void
@@ -125,11 +125,11 @@ public class Node(
 
 	func equals(that: Node) -> boolean
 	{
-		if (this === that) return true
-		if (this.name !== that.name) return false
-		if (!Collection.unorderedEquals(this.properties, that.properties)) return false
-		if (!Collection.unorderedEquals(this.nodes, that.nodes)) return false
-		if (!Collection.unorderedEquals(this.nodeAccesses, that.nodeAccesses)) return false
+		if (this === that) { return true }
+		if (this.name !== that.name) { return false }
+		if (!Collection.unorderedEquals(this.properties, that.properties)) { return false }
+		if (!Collection.unorderedEquals(this.nodes, that.nodes)) { return false }
+		if (!Collection.unorderedEquals(this.nodeAccesses, that.nodeAccesses)) { return false }
 		return true
 	}
 

@@ -6,7 +6,7 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 {
 	private var indent: int = 0
 
-	private func printIndent() -> void = for (i <- 0 ..< this.indent) System.out.print('\t')
+	private func printIndent() -> void = for i <- 0 ..< this.indent { System.out.print('\t') }
 
 	private func value(text: String) -> void
 	{

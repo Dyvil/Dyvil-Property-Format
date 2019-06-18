@@ -43,7 +43,7 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
 
 	static final func apply(elements: Value...) -> ListValue = ListValue(elements...)
 
-	static final func apply(entries: (Value, Value)...) = MapValue(entries...)
+	static final func apply(entries: (Value, Value)...) -> MapValue = MapValue(entries...)
 
 	static final func apply(base: String, values: Value...) -> StringInterpolation
 		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
@@ -66,13 +66,13 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
 
 		let valueClass = value.dynamicClass
 
-		if (valueClass === class String)  return StringValue(value as String)
-		if (valueClass === class Int)     return IntValue(value as Int)
-		if (valueClass === class Long)    return LongValue(value as Long)
-		if (valueClass === class Float)   return FloatValue(value as Float)
-		if (valueClass === class Double)  return DoubleValue(value as Double)
-		if (valueClass === class Name)    return NameAccess(value as Name)
-		if (valueClass === class Boolean) return Value(value as boolean)
+		if (valueClass === class String)  { return StringValue(value as String) }
+		if (valueClass === class Int)     { return IntValue(value as Int) }
+		if (valueClass === class Long)    { return LongValue(value as Long) }
+		if (valueClass === class Float)   { return FloatValue(value as Float) }
+		if (valueClass === class Double)  { return DoubleValue(value as Double) }
+		if (valueClass === class Name)    { return NameAccess(value as Name) }
+		if (valueClass === class Boolean) { return Value(value as boolean) }
 
 		if let conv = value as? DPFConvertible { return conv }
 		if let list = value as? List { return ListValue(list) }
