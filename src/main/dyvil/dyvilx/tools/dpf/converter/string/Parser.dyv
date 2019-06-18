@@ -9,8 +9,8 @@ import dyvilx.tools.parsing.{ TokenIterator, TokenList }
 import dyvilx.tools.parsing.lexer.BaseSymbols
 import dyvilx.tools.parsing.lexer.DyvilLexer
 import dyvilx.tools.parsing.lexer.Tokens
+import dyvilx.tools.parsing.marker.Marker
 import dyvilx.tools.parsing.marker.MarkerList
-import dyvilx.tools.parsing.marker.SyntaxError
 import dyvilx.tools.parsing.token.IToken
 
 using dyvilx.tools.parsing.token.IToken.`type` as ttype
@@ -84,7 +84,7 @@ public class Parser
 			case _ {}
 		}
 
-		this.markers.add(new SyntaxError(token, "Invalid Node Element - Invalid \(token)"))
+		this.markers.add(Marker(token, .SYNTAX, "Invalid Node Element - Invalid \(token)"))
 		return true
 	}
 
@@ -187,7 +187,7 @@ public class Parser
 			case _ {}
 		}
 
-		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid \(token)"))
+		this.markers.add(Marker(token, .SYNTAX, "Invalid Value - Invalid \(token)"))
 	}
 
 	private func parseList(visitor: ListVisitor) -> void
@@ -215,7 +215,7 @@ public class Parser
 				case _ {}
 			}
 
-			this.markers.add(new SyntaxError(token, "Invalid List - ',' expected"))
+			this.markers.add(Marker(token, .SYNTAX, "Invalid List - ',' expected"))
 		}
 	}
 
@@ -235,7 +235,7 @@ public class Parser
 			var token = this.tokens.next()
 			if (token.ttype != BaseSymbols.COLON)
 			{
-				this.markers.add(new SyntaxError(token, "Invalid Map - ':' expected"))
+				this.markers.add(Marker(token, .SYNTAX, "Invalid Map - ':' expected"))
 			}
 
 			this.parseValue(visitor.visitValue())
@@ -285,7 +285,7 @@ public class Parser
 				case _ {}
 			}
 
-			this.markers.add(new SyntaxError(token, "Invalid String Interpolation - String expected"))
+			this.markers.add(Marker(token, .SYNTAX, "Invalid String Interpolation - String expected"))
 		}
 	}
 
@@ -342,7 +342,7 @@ public class Parser
 		let token = this.tokens.lastReturned()
 		if (token.ttype != BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
-			this.markers.add(new SyntaxError(token, "Invalid Builder - '}' expected"))
+			this.markers.add(Marker(token, .SYNTAX, "Invalid Builder - '}' expected"))
 		}
 	}
 
