@@ -4,8 +4,7 @@ import dyvilx.tools.dpf.ast._
 import dyvilx.tools.dpf.ast.builder._
 import dyvilx.tools.dpf.ast.value._
 
-public class DPFSyntax
-{
+public class DPFSyntax {
 	/**
 	 * Root Node
 	 *
@@ -18,7 +17,7 @@ public class DPFSyntax
 	 *
 	 * "name" { ... }
 	 */
-	infix func apply(name: Name, configure: Configure<Node>) -> Node = new Node(name).use(configure)
+	final extension func apply(this: Name, configure: Configure<Node>) -> Node = new Node(this).use(configure)
 
 	/**
 	 * Nested Node creation
@@ -27,28 +26,28 @@ public class DPFSyntax
 	 *     "child" { ... }
 	 * }
 	 */
-	infix func applyStatement(base: Node, node: Node) -> void = base.add(node)
+	final extension func applyStatement(this: Node, node: Node) -> void = this.add(node)
 
 	/**
 	 * Property creation with Colon
 	 *
 	 * "name": value
 	 */
-	infix func applyStatement(base: Node, pair: (Name, Value)) -> void = base.add(new Property(pair._1, pair._2))
+	final extension func applyStatement(this: Node, pair: (Name, Value)) -> void = this.add(new Property(pair._1, pair._2))
 
 	/**
 	 * Builder creation
 	 *
 	 * "Name"("value", "label": "value")
 	 */
-	infix func apply(name: Name, parameters: (Value | (Name, Value))...) -> Builder
-	{
-		let builder = new Builder(name)
+	final extension func apply(this: Name, parameters: (Value | (Name, Value))...) -> Builder {
+		let builder = new Builder(this)
 
-		for (element <- parameters) element match
-		{
-			case let v: Value => builder.add(Parameter(v))
-			case (let n: Name, let v: Value) => builder.add(Parameter(n, v))
+		for element <- parameters {
+			element match {
+				case let v: Value => builder.add(Parameter(v))
+				case (let n: Name, let v: Value) => builder.add(Parameter(n, v))
+			}
 		}
 
 		return builder
@@ -59,9 +58,8 @@ public class DPFSyntax
 	 *
 	 * "Name"("value", "label": "value") { ... }
 	 */
-	infix func apply(name: Name, parameters: (Value | (Name, Value))..., node configure: Configure<Node>) -> Builder
-	{
-		let builder = name(parameters...)
+	final extension func apply(this: Name, parameters: (Value | (Name, Value))..., node configure: Configure<Node>) -> Builder {
+		let builder = this(parameters...)
 		configure(builder.visitNode())
 		return builder
 	}
