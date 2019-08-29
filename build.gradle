@@ -4,7 +4,7 @@ plugins {
 	id 'maven-publish'
 	id 'com.jfrog.bintray' version '1.8.4'
 	id 'de.clashsoft.simple-publish' version '0.3.0'
-	id 'org.dyvil.dyvil-gradle' version '0.2.0'
+	id 'org.dyvil.dyvil-gradle' version '0.4.0'
 }
 
 group = 'org.dyvil'
@@ -38,13 +38,13 @@ repositories {
 
 dependencies {
 	// https://mvnrepository.com/artifact/org.dyvil/compiler
-	dyvilc group: 'org.dyvil', name: 'compiler', version: '0.45.0'
+	dyvilc group: 'org.dyvil', name: 'compiler', version: '0.46.3'
 
 	// https://mvnrepository.com/artifact/org.dyvil/gensrc
-	gensrc group: 'org.dyvil', name: 'gensrc', version: '0.9.6'
+	gensrc group: 'org.dyvil', name: 'gensrc', version: '0.10.1'
 
 	// https://mvnrepository.com/artifact/org.dyvil/library
-	compile group: 'org.dyvil', name: 'library', version: '0.45.0'
+	compile group: 'org.dyvil', name: 'library', version: '0.46.0'
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
