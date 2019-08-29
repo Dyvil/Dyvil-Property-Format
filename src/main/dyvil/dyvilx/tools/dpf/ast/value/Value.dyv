@@ -2,13 +2,12 @@ package dyvilx.tools.dpf.ast.value
 
 import dyvilx.tools.dpf.DPFConvertible
 
-import dyvil.collection.mutable.ArrayList
-
 import dyvilx.tools.dpf.ast.value._
 import dyvilx.tools.dpf.visitor.ValueVisitor
 import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
+import java.util.{ List, ArrayList, Map }
 import java.lang.reflect.Array
 
 @LiteralConvertible.FromInt
@@ -82,7 +81,7 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
 		{
 			// Convert Arrays using Reflection
 			let size = Array.getLength(value)
-			let list = new ArrayList<Value>(capacity: size)
+			let list = ArrayList<Value>(capacity: size)
 
 			for (i <- 0 ..< size)
 			{

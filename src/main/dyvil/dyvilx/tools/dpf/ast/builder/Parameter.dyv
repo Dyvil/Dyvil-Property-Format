@@ -6,6 +6,8 @@ import dyvilx.tools.dpf.converter.DPFValueVisitor
 import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
+import java.util.Map
+
 public case class Parameter
 (
 	var name:  Name?  { get; set }

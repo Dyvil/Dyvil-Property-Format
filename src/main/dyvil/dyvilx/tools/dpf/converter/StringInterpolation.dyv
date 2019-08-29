@@ -3,10 +3,12 @@ package dyvilx.tools.dpf.converter
 import dyvilx.tools.dpf.model.Expandable
 import dyvilx.tools.dpf.visitor.{ StringInterpolationVisitor, ValueVisitor }
 
+import java.util.{ List, ArrayList, Map }
+
 class StringInterpolation implements StringInterpolationVisitor, Expandable
 {
-	let strings: List<String> = new mutable.ArrayList<String>
-	let values: List<Object!> = new mutable.ArrayList<Object!>
+	let strings: List<String> = ArrayList<String>()
+	let values: List<Object!> = ArrayList<Object!>()
 
 	override func visitStringPart(string: String) -> void = this.strings.add(string)
 

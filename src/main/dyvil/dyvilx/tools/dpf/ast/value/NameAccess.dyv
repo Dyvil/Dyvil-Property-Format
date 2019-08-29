@@ -1,11 +1,11 @@
 package dyvilx.tools.dpf.ast.value
 
-import dyvil.collection.Map
 import dyvilx.tools.dpf.model.Expandable
 import dyvilx.tools.dpf.converter.DPFValueVisitor
 import dyvilx.tools.dpf.visitor.ValueVisitor
 import dyvilx.tools.parsing.ASTNode
 
+import java.util.Map
 import java.util.Objects
 
 class NameAccess
@@ -32,7 +32,7 @@ extends DPFValueVisitor implements Value, Expandable
 		this.value!.accept(visitor.visitValueAccess(this.name))
 	}
 
-	override func expand(mappings: [String:Object], mutate: boolean) -> Object
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
 	{
 		let builder = new StringBuilder()
 

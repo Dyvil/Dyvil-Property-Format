@@ -1,6 +1,14 @@
 package dyvilx.tools.dpf.model
 
+import java.util.{ List, Map }
+import java.util.stream.Collectors
+import java.util.function.UnaryOperator
+
 interface Expandable {
+	func expand(mappings: Map<String, Object>) -> void = this.expand(mappings, true)
+
+	func expanded(mappings: Map<String, Object>) -> Object = this.expand(mappings, false)
+
 	func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
 
 	static func expand(obj: Object, mappings: Map<String, Object>, mutate: boolean) -> Object
@@ -8,32 +16,75 @@ interface Expandable {
 }
 
 extension Object {
+	final func expand(mappings: Map<String, Object>) -> void {
+		this.expand(mappings, true)
+	}
+
+	final func expanded(mappings: Map<String, Object>) -> Object {
+		return this.expand(mappings, false)
+	}
+
 	func expand(mappings: Map<String, Object>, mutate: boolean) -> Object {
 		this match {
-			case var exp: Expandable    => exp.expand(mappings, mutate)
-			case var col: Collection<_> => col.expand(mappings, mutate)
-			case var map: Map<_, _>     => map.expand(mappings, mutate)
+			case var exp: Expandable => exp.expand(mappings, mutate)
+			case var lst: List<_>    => lst.expand(mappings, mutate)
+			case var map: Map<_, _>  => map.expand(mappings, mutate)
 			case _ => this
 		}
 	}
 }
 
 extension Map<_, _> {
+	final func expand(mappings: Map<String, Object>) -> void {
+		let expanded = this.expanded(mappings)
+		this.clear()
+		this.putAll(expanded)
+	}
+
+	final func expanded(mappings: Map<String, Object>) -> Map<_, _> {
+		return this.entrySet.stream()
+		                    .map(e => (e.getKey().expand(mappings, false), e.getValue().expand(mappings, false)))
+		                    .collect(Collectors.toMap<(Object, Object), Object, Object>(_._1, _._2))
+	}
+
 	final func expand(mappings: Map<String, Object>, mutate: boolean) -> Map<_, _> {
-		if !mutate || this.isImmutable() {
-			return this.entryMapped((k, v) => (k.expand(mappings, mutate), v.expand(mappings, mutate)))
+		let expanded = this.expanded(mappings)
+		if !mutate {
+			return expanded
 		}
-		this.mapEntries((k, v) => (k.expand(mappings, true), v.expand(mappings, true)))
-		return this
+
+		try {
+			this.clear()
+			this.putAll(expanded)
+			return this
+		}
+		catch ex: UnsupportedOperationException {
+			return expanded
+		}
 	}
 }
 
-extension Collection<_> {
-	final func expand(mappings: Map<String, Object>, mutate: boolean) -> Collection<_> {
-		if !mutate || this.isImmutable() {
-			return this.mapped(_.expand(mappings, mutate))
+extension List<_> {
+	final func expand(mappings: Map<String, Object>) -> void {
+		// TODO replace with lambda
+		this.replaceAll(new UnaryOperator<any!> { override func apply(o: any!) -> any! = o.expand(mappings) })
+	}
+
+	final func expanded(mappings: Map<String, Object>) -> List<_> {
+		return this.stream.map(_.expand(mappings, true)).collect(Collectors.toList)
+	}
+
+	final func expand(mappings: Map<String, Object>, mutate: boolean) -> List<_> {
+		if !mutate {
+			return this.expanded(mappings)
 		}
-		this.map(_.expand(mappings, true))
-		return this
+
+		try {
+			this.expand(mappings)
+			return this
+		}
+		catch ex: UnsupportedOperationException {
+			return this.expanded(mappings)
+		}
 	}
 }

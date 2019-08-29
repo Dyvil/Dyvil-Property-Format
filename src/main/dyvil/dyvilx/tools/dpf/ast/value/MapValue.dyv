@@ -1,17 +1,25 @@
 package dyvilx.tools.dpf.ast.value
 
-import dyvilx.tools.dpf.model.Expandable
+using dyvilx.tools.dpf.model.Expandable._
 import dyvilx.tools.dpf.converter.DPFValueVisitor
 import dyvilx.tools.dpf.visitor.{ MapVisitor, ValueVisitor }
 import dyvilx.tools.parsing.ASTNode
 
+import java.util.{ Map, LinkedHashMap }
 import java.util.function.BiFunction
 
 @LiteralConvertible.FromMap
 case class MapValue(protected let entries: Map<Value, Value> { public get })
 	implements Value, MapVisitor, Expandable
 {
-	static final func apply(entries: (Value, Value)...) -> MapValue = MapValue(MutableMap(entries...))
+	static final func apply(entries: (Value, Value)...) -> MapValue {
+		// TODO replace with LinkedHashMap(entries...)
+		let map = new LinkedHashMap<Value, Value>(entries.size)
+		for entry <- entries {
+			map.put(entry._1, entry._2)
+		}
+		return MapValue(map)
+	}
 
 	// Visitor
 
@@ -34,8 +42,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 	{
 		let mapVisitor = visitor.visitMap()
 
-		for (entry <- this.entries)
-		{
+		for entry <- this.entries.entrySet {
 			entry.getKey().accept(mapVisitor.visitKey())
 			entry.getValue().accept(mapVisitor.visitValue())
 		}
@@ -47,19 +54,8 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 	override func expand(mappings: Map<String, Object>, mutate: boolean) -> MapValue
 	{
-		let entryBiFunction: BiFunction<Value, Value, Entry<+Value, +Value>>
-			= (k, v) => (
-				Value.wrap(Expandable.expand(k, mappings, mutate)),
-				Value.wrap(Expandable.expand(v, mappings, mutate))
-			)
-
-		if (mutate)
-		{
-			this.entries.mapEntries(entryBiFunction)
-			return this
-		}
-
-		return new MapValue(this.entries.entryMapped(entryBiFunction))
+		let expanded = this.entries.expand(mappings, mutate) as Map<Value, Value>
+		return expanded === this.entries ? this : new MapValue(expanded)
 	}
 
 	// String
@@ -75,8 +71,8 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 			return
 		}
 
-		let keys: [Value] = this.entries.toKeyArray(class Value)
-		let values: [Value] = this.entries.toValueArray(class Value)
+		let keys = this.entries.keySet.toArray([Value](0)) as [Value]
+		let values = this.entries.values.toArray([Value](0)) as [Value]
 
 		let innerIndent = indent + '\t'
 

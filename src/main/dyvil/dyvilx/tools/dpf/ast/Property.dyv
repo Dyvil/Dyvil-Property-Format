@@ -7,6 +7,8 @@ import dyvilx.tools.dpf.model.Expandable
 import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
+import java.util.Map
+
 public class Property
 (
 	protected let name:  Name   { public override get }

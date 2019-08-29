@@ -1,10 +1,8 @@
 package dyvilx.tools.dpf.converter
 
-import dyvil.collection.List
-import dyvil.collection.Map
-import dyvil.collection.mutable.ArrayList
-import dyvil.collection.mutable.HashMap
 import dyvilx.tools.dpf.visitor._
+
+import java.util.{ List, ArrayList, Map, HashMap }
 
 /**
  * An abstract {@link ValueVisitor} that converts nodes to Dyvil and Java objects / wrappers according to the following
@@ -42,7 +40,7 @@ abstract class DyvilValueVisitor implements ValueVisitor
 
 	override func visitList() -> ListVisitor
 	{
-		let list = new ArrayList<Object!>
+		let list = ArrayList<Object!>()
 		return new ListVisitor
 		{
 			override func visitElement() -> ValueVisitor = new DyvilValueVisitor()

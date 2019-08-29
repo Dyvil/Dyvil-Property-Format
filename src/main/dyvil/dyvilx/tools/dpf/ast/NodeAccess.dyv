@@ -5,6 +5,8 @@ import dyvilx.tools.dpf.model.Expandable
 import dyvil.source.position.SourcePosition
 import dyvilx.tools.parsing.ASTNode
 
+import java.util.Map
+
 public class NodeAccess
 (
 	protected let name: Name { public override get }

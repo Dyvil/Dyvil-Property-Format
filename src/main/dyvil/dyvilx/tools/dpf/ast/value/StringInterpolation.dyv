@@ -1,14 +1,13 @@
 package dyvilx.tools.dpf.ast.value
 
-import dyvil.collection.List
-import dyvil.collection.Map
-import dyvil.collection.mutable.ArrayList
 import dyvilx.tools.dpf.model.Expandable
 import dyvilx.tools.dpf.converter.DPFValueVisitor
 import dyvilx.tools.dpf.visitor.StringInterpolationVisitor
 import dyvilx.tools.dpf.visitor.ValueVisitor
 import dyvilx.tools.parsing.ASTNode
 import dyvilx.tools.parsing.lexer.StringLiterals
+
+import java.util.{ List, ArrayList, Map }
 
 public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {
@@ -17,20 +16,20 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 
 	public init()
 	{
-		this.strings = new ArrayList<String>
-		this.values = new ArrayList<Value>
+		this.strings = ArrayList<String>()
+		this.values = ArrayList<Value>()
 	}
 
 	public init(strings: [String], values: [Value])
 	{
-		this.strings = new ArrayList(strings)
-		this.values = new ArrayList(values)
+		this.strings = ArrayList(strings...)
+		this.values = ArrayList(values...)
 	}
 
 	public init(strings: [String], values: [any])
 	{
-		this.strings = new ArrayList(strings)
-		this.values = new ArrayList<Value>(values.size)
+		this.strings = ArrayList(strings...)
+		this.values = ArrayList<Value>(values.size)
 
 		for (o <- values)
 		{

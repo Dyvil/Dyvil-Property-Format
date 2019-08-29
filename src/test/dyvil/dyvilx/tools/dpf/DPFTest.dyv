@@ -6,15 +6,16 @@ import java.io._
 import org.junit.Test
 import org.junit.Assert
 
-import dyvil.collection.mutable.TreeMap
+import java.util.{ Map, TreeMap }
 
+import dyvilx.tools.dpf.DPFConvertible
 import dyvilx.tools.dpf.ast._
 import dyvilx.tools.dpf.ast.value.Value
 import dyvilx.tools.dpf.model._
 import dyvilx.tools.dpf.converter.{ binary._, string._, flatmap._ }
 
 using dyvilx.tools.dpf.DPFSyntax._
-import dyvilx.tools.dpf.DPFConvertible
+using dyvilx.tools.dpf.model.Expandable._
 
 class DPFTest {
 	// TODO use DyvilTest
@@ -84,7 +85,7 @@ class DPFTest {
 		let nodeMap = new TreeMap<String, Object>
 		expandedNode.accept(new FlatMapConverter(nodeMap))
 
-		let expandedMap = Expandable.expand(baseMap, baseMap, false) as Map<String, Object>
+		let expandedMap = baseMap.expanded(baseMap) as Map<String, Object>
 
 		nodeMap =?= expandedMap
 	}

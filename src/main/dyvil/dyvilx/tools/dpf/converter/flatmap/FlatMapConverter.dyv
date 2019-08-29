@@ -1,6 +1,6 @@
 package dyvilx.tools.dpf.converter.flatmap
 
-import dyvil.collection.Map
+import java.util.Map
 import dyvilx.tools.dpf.converter.DyvilValueVisitor
 import dyvilx.tools.dpf.visitor.NodeVisitor
 import dyvilx.tools.dpf.visitor.ValueVisitor

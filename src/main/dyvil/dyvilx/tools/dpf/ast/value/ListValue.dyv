@@ -1,17 +1,18 @@
 package dyvilx.tools.dpf.ast.value
 
-import dyvilx.tools.dpf.model.Expandable
+using dyvilx.tools.dpf.model.Expandable._
 import dyvilx.tools.dpf.converter.DPFValueVisitor
 import dyvilx.tools.dpf.visitor.{ ListVisitor, ValueVisitor }
 import dyvilx.tools.parsing.ASTNode
 
-import java.util.function.Function
+import java.util.{ List, ArrayList, Map }
+import java.util.function.UnaryOperator
 
 @LiteralConvertible.FromArray
 case class ListValue(protected let elements: List<Value> { public get })
 	implements Value, ListVisitor, Expandable
 {
-	static final func apply(elements: Value...) -> ListValue = ListValue(MutableList(elements...))
+	static final func apply(elements: Value...) -> ListValue = ListValue(ArrayList(elements...))
 
 	// Visitor
 
@@ -35,14 +36,8 @@ case class ListValue(protected let elements: List<Value> { public get })
 
 	override func expand(mappings: Map<String, Object>, mutate: boolean) -> ListValue
 	{
-		let valueFunction: Function<Value, Value> = value => Value.wrap(Expandable.expand(value, mappings, mutate))
-		if (mutate)
-		{
-			this.elements.map(valueFunction)
-			return this
-		}
-
-		return new ListValue(this.elements.mapped(valueFunction))
+		let expanded = this.elements.expand(mappings, mutate) as List<Value>
+		return expanded === this.elements ? this : new ListValue(expanded)
 	}
 
 	// String

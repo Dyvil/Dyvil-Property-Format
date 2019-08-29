@@ -8,6 +8,8 @@ import dyvilx.tools.dpf.{
 import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
+import java.util.{ List, ArrayList, Map }
+
 public class Builder
 (
 	protected let name:       Name { public override get }
@@ -18,11 +20,11 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 {
 	static func apply(name: Name) -> Builder = new Builder(name)
 
-	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, mutable.ArrayList(parameters...), null)
+	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, ArrayList(parameters...), null)
 
 	static func apply(name: Name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
 
-	public init(name: Name) : this(name, new mutable.ArrayList<Parameter>, null)
+	public init(name: Name) : this(name, ArrayList<Parameter>(), null)
 
 	@JavaName("withNode")
 	func with(node: Node) -> Builder { this.node = node; this }
