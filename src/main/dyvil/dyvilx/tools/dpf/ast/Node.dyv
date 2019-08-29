@@ -10,8 +10,9 @@ import dyvil.source.position.SourcePosition
 
 public class Node(
 	protected let name: Name { public override get }
-) implements dyvilx.tools.dpf.model.Node, NodeElement
-{
+)
+implements dyvilx.tools.dpf.model.Node, NodeElement {
+
 	var nodes: Map<Name, Node> = new LinkedHashMap<Name, Node>
 	var properties: Map<Name, Property> = new LinkedHashMap<Name, Property>
 	var nodeAccesses: Map<Name, NodeAccess> = new LinkedHashMap<Name, NodeAccess>
@@ -25,22 +26,19 @@ public class Node(
 	@JavaName("addProperty")
 	func add(property: Property) -> void = this.properties.put(property.name, property)
 
-	override func visitNode(name: Name) -> NodeVisitor
-	{
+	override func visitNode(name: Name) -> NodeVisitor {
 		let node = new Node(name)
 		this.add(node)
 		return node
 	}
 
-	override func visitProperty(name: Name) -> ValueVisitor
-	{
+	override func visitProperty(name: Name) -> ValueVisitor {
 		let property = new Property(name)
 		this.add(property)
 		return property
 	}
 
-	override func visitNodeAccess(name: Name) -> NodeVisitor
-	{
+	override func visitNodeAccess(name: Name) -> NodeVisitor {
 		let access = new NodeAccess(name)
 		this.add(access)
 		return access
@@ -48,38 +46,32 @@ public class Node(
 
 	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor.visitNode(this.name))
 
-	internal func acceptBody(nodeVisitor: NodeVisitor) -> void
-	{
-		for (element <- this.properties.values) { element.accept(nodeVisitor) }
-		for (node <- this.nodes.values) { node.accept(nodeVisitor) }
-		for (nodeAccess <- this.nodeAccesses.values) { nodeAccess.accept(nodeVisitor) }
+	internal func acceptBody(nodeVisitor: NodeVisitor) -> void {
+		for element <- this.properties.values { element.accept(nodeVisitor) }
+		for node <- this.nodes.values { node.accept(nodeVisitor) }
+		for nodeAccess <- this.nodeAccesses.values { nodeAccess.accept(nodeVisitor) }
 		nodeVisitor.visitEnd()
 	}
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Node
-	{
-		if (mutate)
-		{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Node {
+		if mutate {
 			this.expandChildren(mappings)
 			return this
 		}
-		else
-		{
+		else {
 			let node = new Node(this.name)
 			this.expand(node, mappings)
 			return node
 		}
 	}
 
-	protected func expandChildren(mappings: Map<String, Object>) -> void
-	{
-		for (node <- this.nodes.values) { node.expand(mappings, true) }
-		for (property <- this.properties.values) { property.expand(mappings, true) }
-		for (nodeAccess <- this.nodeAccesses.values) { nodeAccess.expand(mappings, true) }
+	protected func expandChildren(mappings: Map<String, Object>) -> void {
+		for node <- this.nodes.values { node.expand(mappings, true) }
+		for property <- this.properties.values { property.expand(mappings, true) }
+		for nodeAccess <- this.nodeAccesses.values { nodeAccess.expand(mappings, true) }
 	}
 
-	protected func expand(node: Node, mappings: Map<String, Object>) -> void
-	{
+	protected func expand(node: Node, mappings: Map<String, Object>) -> void {
 		node.nodes = this.nodes.expanded(mappings) as Map<Name, Node>
 		node.properties = this.properties.expanded(mappings) as Map<Name, Property>
 		node.nodeAccesses = this.nodeAccesses.expanded(mappings) as Map<Name, NodeAccess>
@@ -87,8 +79,7 @@ public class Node(
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
 		buffer.append(this.name).append('\n').append(indent).append('{').append('\n')
 
 		this.bodyToString(indent + '\t', buffer)
@@ -96,24 +87,20 @@ public class Node(
 		buffer.append(indent).append('}')
 	}
 
-	func bodyToString(indent: String, buffer: StringBuilder) -> void
-	{
-		for (element <- this.properties.values)
-		{
+	func bodyToString(indent: String, buffer: StringBuilder) -> void {
+		for element <- this.properties.values {
 			buffer.append(indent)
 			element.toString(indent, buffer)
 			buffer.append('\n')
 		}
 
-		for (node <- this.nodes.values)
-		{
+		for node <- this.nodes.values {
 			buffer.append(indent).append('\n').append(indent)
 			node.toString(indent, buffer)
 			buffer.append('\n')
 		}
 
-		for (nodeAccess <- this.nodeAccesses.values)
-		{
+		for nodeAccess <- this.nodeAccesses.values {
 			buffer.append(indent).append('\n').append(indent)
 			nodeAccess.toString(indent, buffer)
 			buffer.append('\n')
@@ -122,18 +109,16 @@ public class Node(
 
 	override func equals(obj: any!) -> boolean = this === obj || obj is Node && this.equals(obj as Node)
 
-	func equals(that: Node) -> boolean
-	{
-		if (this === that) { return true }
-		if (this.name !== that.name) { return false }
-		if (this.properties != that.properties) { return false }
-		if (this.nodes != that.nodes) { return false }
-		if (this.nodeAccesses != that.nodeAccesses) { return false }
+	func equals(that: Node) -> boolean {
+		if this === that { return true }
+		if this.name !== that.name { return false }
+		if this.properties != that.properties { return false }
+		if this.nodes != that.nodes { return false }
+		if this.nodeAccesses != that.nodeAccesses { return false }
 		return true
 	}
 
-	override func hashCode() -> int
-	{
+	override func hashCode() -> int {
 		let prime = 31
 		var result = this.name.hashCode()
 		result = prime * result + this.properties.hashCode()

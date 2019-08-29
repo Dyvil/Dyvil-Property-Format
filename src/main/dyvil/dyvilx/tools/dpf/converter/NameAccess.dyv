@@ -3,13 +3,12 @@ package dyvilx.tools.dpf.converter
 import dyvilx.tools.dpf.model.Expandable
 import java.util.Map
 
-class NameAccess
-(
+class NameAccess (
 	var value: Object? { private set; public get }
 	let name:  String
 )
-extends DyvilValueVisitor implements Expandable
-{
+extends DyvilValueVisitor implements Expandable {
+
 	static func apply(name: String) -> NameAccess = new NameAccess(null, name)
 
 	static func apply(value: Object, name: String) -> NameAccess = new NameAccess(value, name)
@@ -18,10 +17,8 @@ extends DyvilValueVisitor implements Expandable
 
 	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object = mappings[this.toString] ?? this
 
-	override func toString() -> String
-	{
-		if (this.value == null)
-		{
+	override func toString() -> String {
+		if this.value == null {
 			return this.name
 		}
 		return "\(this.value).\(this.name)"

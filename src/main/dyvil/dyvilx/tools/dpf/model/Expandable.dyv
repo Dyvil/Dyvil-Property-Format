@@ -71,7 +71,7 @@ extension List<_> {
 	}
 
 	final func expanded(mappings: Map<String, Object>) -> List<_> {
-		return this.stream.map(_.expand(mappings, true)).collect(Collectors.toList)
+		return this.stream.map(_.expand(mappings, true)).collect(Collectors.toList<Object>())
 	}
 
 	final func expand(mappings: Map<String, Object>, mutate: boolean) -> List<_> {

@@ -10,14 +10,13 @@ import dyvil.source.position.SourcePosition
 
 import java.util.{ List, ArrayList, Map }
 
-public class Builder
-(
+public class Builder (
 	protected let name:       Name { public override get }
 	protected var parameters: List<Parameter>
 	protected var node:       Node? { public override get }
 )
-implements Value, dyvilx.tools.dpf.model.value.Builder
-{
+implements Value, dyvilx.tools.dpf.model.value.Builder {
+
 	static func apply(name: Name) -> Builder = new Builder(name)
 
 	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, ArrayList(parameters...), null)
@@ -37,8 +36,7 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	override func visitParameter(name: Name!) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
 
-	override func visitNode() -> Node
-	{
+	override func visitNode() -> Node {
 		if let node = this.node {
 			return node
 		}
@@ -47,30 +45,23 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	override func visitEnd() -> void { }
 
-	override func accept(visitor: ValueVisitor) -> void
-	{
+	override func accept(visitor: ValueVisitor) -> void {
 		let builderVisitor = visitor.visitBuilder(this.name)
-		for (parameter <- this.parameters)
-		{
+		for parameter <- this.parameters {
 			parameter.value.accept(builderVisitor.visitParameter(parameter.name))
 		}
-		if let node = this.node
-		{
+		if let node = this.node {
 			node.acceptBody(builderVisitor.visitNode())
 		}
 		builderVisitor.visitEnd()
 	}
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Builder
-	{
-		if (mutate)
-		{
-			for (parameter <- this.parameters)
-			{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Builder {
+		if mutate {
+			for parameter <- this.parameters {
 				parameter.expand(mappings, true)
 			}
-			if (this.node != null)
-			{
+			if this.node != null {
 				this.node = this.node!.expand(mappings, true)
 			}
 			return this
@@ -83,32 +74,27 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
 		buffer.append(this.name)
 
 		let parameterCount = this.parameters.size
-		if (parameterCount > 0)
-		{
+		if parameterCount > 0 {
 			buffer.append('(')
 
 			this.parameters[0].toString(indent, buffer)
-			for (i <- 1 ..< parameterCount)
-			{
+			for i <- 1 ..< parameterCount {
 				buffer.append(", ")
 				this.parameters[i].toString(indent, buffer)
 			}
 
 			buffer.append(')')
 		}
-		else if (this.node == null)
-		{
+		else if this.node == null {
 			buffer.append("()")
 			return
 		}
 
-		if let node = this.node
-		{
+		if let node = this.node {
 			buffer.append(" {\n")
 			node.bodyToString(indent + '\t', buffer)
 			buffer.append(indent).append('}')
@@ -119,8 +105,7 @@ implements Value, dyvilx.tools.dpf.model.value.Builder
 
 	func equals(that: Builder) -> boolean = this === that || this.name === that.name && this.parameters == that.parameters && this.node == that.node
 
-	override func hashCode() -> int
-	{
+	override func hashCode() -> int {
 		var result = this.name.hashCode
 		result = 31 * result + this.parameters.hashCode
 		result = 31 * result + this.node.hashCode

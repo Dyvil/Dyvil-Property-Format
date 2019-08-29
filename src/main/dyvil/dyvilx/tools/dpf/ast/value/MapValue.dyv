@@ -10,8 +10,8 @@ import java.util.function.BiFunction
 
 @LiteralConvertible.FromMap
 case class MapValue(protected let entries: Map<Value, Value> { public get })
-	implements Value, MapVisitor, Expandable
-{
+	implements Value, MapVisitor, Expandable {
+
 	static final func apply(entries: (Value, Value)...) -> MapValue {
 		// TODO replace with LinkedHashMap(entries...)
 		let map = new LinkedHashMap<Value, Value>(entries.size)
@@ -30,16 +30,14 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 	}
 
 	override func visitValue() -> ValueVisitor = new DPFValueVisitor {
-		override func visitValue(value: Value) -> void
-		{
+		override func visitValue(value: Value) -> void {
 			let map = this<MapValue>
 			map.entries.put(map.tempKey, value)
 			map.tempKey = null
 		}
 	}
 
-	override func accept(visitor: ValueVisitor) -> void
-	{
+	override func accept(visitor: ValueVisitor) -> void {
 		let mapVisitor = visitor.visitMap()
 
 		for entry <- this.entries.entrySet {
@@ -52,8 +50,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 	// Expandable
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> MapValue
-	{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> MapValue {
 		let expanded = this.entries.expand(mappings, mutate) as Map<Value, Value>
 		return expanded === this.entries ? this : new MapValue(expanded)
 	}
@@ -62,11 +59,9 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
 		let size = this.entries.size
-		if (size <= 0)
-		{
+		if size <= 0 {
 			buffer.append('{}')
 			return
 		}
@@ -81,8 +76,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 		buffer.append(' : ')
 		values[0].toString(innerIndent, buffer)
 
-		for (i <- 1 ..< size)
-		{
+		for i <- 1 ..< size {
 			buffer.append(',\n').append(innerIndent)
 			keys[i].toString(innerIndent, buffer)
 			buffer.append(' : ')

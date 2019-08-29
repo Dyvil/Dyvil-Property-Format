@@ -8,13 +8,12 @@ import dyvil.source.position.SourcePosition
 
 import java.util.Map
 
-public case class Parameter
-(
+public case class Parameter (
 	var name:  Name?  { get; set }
 	var value: Value! { get; set }
 )
-extends DPFValueVisitor implements ASTNode, Expandable
-{
+extends DPFValueVisitor implements ASTNode, Expandable {
+
 	// Constructors
 
 	static func apply(name: Name) -> Parameter = new Parameter(name, null)
@@ -29,8 +28,7 @@ extends DPFValueVisitor implements ASTNode, Expandable
 
 	override var position: SourcePosition! { get: null; set {} }
 
-	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter
-	{
+	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter {
 		let parameter = mutate ? this : new Parameter(this.name)
 		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return parameter
@@ -38,10 +36,8 @@ extends DPFValueVisitor implements ASTNode, Expandable
 
 	public override func toString() -> String = format(this)
 
-	public override func toString(indent: String, buffer: StringBuilder) -> void
-	{
-		if (this.name != null)
-		{
+	public override func toString(indent: String, buffer: StringBuilder) -> void {
+		if this.name != null {
 			buffer.append(this.name).append(": ")
 		}
 		this.value.toString(indent, buffer)

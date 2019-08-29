@@ -17,16 +17,13 @@ using dyvilx.tools.parsing.token.IToken.`type` as ttype
 
 import java.io.File
 
-public class Parser
-(
+public class Parser (
 	private let markers: MarkerList
 	private let tokens:  TokenIterator
-)
-{
+) {
 	static func apply(code: String) -> Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
 
-	static func apply(markers: MarkerList, code: String) -> Parser
-	{
+	static func apply(markers: MarkerList, code: String) -> Parser {
 		let tokens = new DyvilLexer(markers, BaseSymbols.INSTANCE).tokenize(code)
 		return Parser(markers, tokens)
 	}
@@ -35,44 +32,35 @@ public class Parser
 
 	static func parse(file: File) -> RootNode = parse(file.tryReadText()!)
 
-	static func parse(code: String) -> RootNode
-	{
+	static func parse(code: String) -> RootNode {
 		let root = new RootNode()
 		Parser(code).parseNodeBody(root)
 		return root
 	}
 
-	func parseNodeBody(visitor: NodeVisitor) -> void
-	{
-		while (this.tokens.hasNext() && this.parseNodeElement(visitor)) {}
+	func parseNodeBody(visitor: NodeVisitor) -> void {
+		while this.tokens.hasNext() && this.parseNodeElement(visitor) {}
 
 		visitor.visitEnd()
 	}
 
-	func parseNodeElement(visitor: NodeVisitor) -> boolean
-	{
+	func parseNodeElement(visitor: NodeVisitor) -> boolean {
 		let token = this.tokens.next()
-		match token.ttype
-		{
-			case Tokens.LETTER_IDENTIFIER
-			{
-				match token.next.ttype
-				{
+		match token.ttype {
+			case Tokens.LETTER_IDENTIFIER {
+				match token.next.ttype {
 					case BaseSymbols.COMMA | BaseSymbols.SEMICOLON => return true
-					case BaseSymbols.OPEN_CURLY_BRACKET
-					{
+					case BaseSymbols.OPEN_CURLY_BRACKET {
 						this.tokens.next()
 						this.parseNodeBody(visitor.visitNode(token.nameValue))
 						return true
 					}
-					case BaseSymbols.DOT
-					{
+					case BaseSymbols.DOT {
 						this.tokens.next()
 						this.parseNodeElement(visitor.visitNodeAccess(token.nameValue))
 						return true
 					}
-					case BaseSymbols.COLON | BaseSymbols.EQUALS
-					{
+					case BaseSymbols.COLON | BaseSymbols.EQUALS {
 						this.tokens.next()
 						this.parseValue(visitor.visitProperty(token.nameValue))
 						return true
@@ -88,82 +76,64 @@ public class Parser
 		return true
 	}
 
-	func parseValue(valueVisitor: ValueVisitor) -> void
-	{
+	func parseValue(valueVisitor: ValueVisitor) -> void {
 		let token = this.tokens.next()
-		match token.ttype
-		{
-			case Tokens.INT
-			{
+		match token.ttype {
+			case Tokens.INT {
 				valueVisitor.visitInt(token.intValue)
 				return
 			}
-			case Tokens.LONG
-			{
+			case Tokens.LONG {
 				valueVisitor.visitLong(token.longValue)
 				return
 			}
-			case Tokens.FLOAT
-			{
+			case Tokens.FLOAT {
 				valueVisitor.visitFloat(token.floatValue)
 				return
 			}
-			case Tokens.DOUBLE
-			{
+			case Tokens.DOUBLE {
 				valueVisitor.visitDouble(token.doubleValue)
 				return
 			}
-			case Tokens.SINGLE_QUOTED_STRING | Tokens.STRING |  Tokens.VERBATIM_STRING | Tokens.VERBATIM_CHAR
-			{
+			case Tokens.SINGLE_QUOTED_STRING | Tokens.STRING |  Tokens.VERBATIM_STRING | Tokens.VERBATIM_CHAR {
 				valueVisitor.visitString(token.stringValue)
 				return
 			}
-			case Tokens.STRING_START
-			{
+			case Tokens.STRING_START {
 				this.parseStringInterpolation(valueVisitor.visitStringInterpolation())
 				return
 			}
-			case Tokens.IDENTIFIER | Tokens.LETTER_IDENTIFIER | Tokens.SYMBOL_IDENTIFIER | Tokens.SPECIAL_IDENTIFIER
-			{
+			case Tokens.IDENTIFIER | Tokens.LETTER_IDENTIFIER | Tokens.SYMBOL_IDENTIFIER | Tokens.SPECIAL_IDENTIFIER {
 				let next = token.next()
-				next.ttype match
-				{
-					case BaseSymbols.DOT
-					{
+				next.ttype match {
+					case BaseSymbols.DOT {
 						this.parseAccessSequence(valueVisitor)
 						return
 					}
-					case BaseSymbols.OPEN_PARENTHESIS | BaseSymbols.OPEN_CURLY_BRACKET
-					{
+					case BaseSymbols.OPEN_PARENTHESIS | BaseSymbols.OPEN_CURLY_BRACKET {
 						this.parseBuilder(valueVisitor.visitBuilder(token.nameValue))
 						return
 					}
 					case _ {}
 				}
-				if ("-" == token.nameValue.unqualified)
-				{
-					next.ttype match
-					{
-						case Tokens.INT
-						{
+				if "-" == token.nameValue.unqualified {
+					next.ttype match {
+						case Tokens.INT {
 							this.tokens.next()
 							valueVisitor.visitInt(-next.intValue)
 							return
 						}
-						case Tokens.LONG
-						{
+						case Tokens.LONG {
 							this.tokens.next()
 							valueVisitor.visitLong(-next.longValue)
 							return
 						}
-						case Tokens.FLOAT
-						{
+						case Tokens.FLOAT {
 							this.tokens.next()
 							valueVisitor.visitFloat(-next.floatValue)
 							return
 						}
-						case Tokens.DOUBLE
-						{
+						case Tokens.DOUBLE {
 							this.tokens.next()
 							valueVisitor.visitDouble(-next.doubleValue)
 							return
@@ -174,13 +144,11 @@ public class Parser
 				valueVisitor.visitName(token.nameValue)
 				return
 			}
-			case BaseSymbols.OPEN_SQUARE_BRACKET
-			{
+			case BaseSymbols.OPEN_SQUARE_BRACKET {
 				this.parseList(valueVisitor.visitList())
 				return
 			}
-			case BaseSymbols.OPEN_CURLY_BRACKET
-			{
+			case BaseSymbols.OPEN_CURLY_BRACKET {
 				this.parseMap(valueVisitor.visitMap())
 				return
 			}
@@ -190,25 +158,20 @@ public class Parser
 		this.markers.add(Marker(token, .SYNTAX, "Invalid Value - Invalid \(token)"))
 	}
 
-	private func parseList(visitor: ListVisitor) -> void
-	{
-		if (this.tokens.lastReturned.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
-		{
+	private func parseList(visitor: ListVisitor) -> void {
+		if this.tokens.lastReturned.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET {
 			this.tokens.next()
 			visitor.visitEnd()
 			return
 		}
 
-		while (this.tokens.hasNext())
-		{
+		while this.tokens.hasNext() {
 			this.parseValue(visitor.visitElement())
 
 			let token = this.tokens.next()
-			match token.ttype
-			{
+			match token.ttype {
 				case BaseSymbols.COMMA => continue
-				case BaseSymbols.CLOSE_SQUARE_BRACKET
-				{
+				case BaseSymbols.CLOSE_SQUARE_BRACKET {
 					visitor.visitEnd()
 					return
 				}
@@ -219,37 +182,30 @@ public class Parser
 		}
 	}
 
-	private func parseMap(visitor: MapVisitor) -> void
-	{
-		if (this.tokens.lastReturned.next.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
-		{
+	private func parseMap(visitor: MapVisitor) -> void {
+		if this.tokens.lastReturned.next.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET {
 			this.tokens.next()
 			visitor.visitEnd()
 			return
 		}
 
-		while (this.tokens.hasNext())
-		{
+		while this.tokens.hasNext() {
 			this.parseValue(visitor.visitKey())
 
 			var token = this.tokens.next()
-			if (token.ttype != BaseSymbols.COLON)
-			{
+			if token.ttype != BaseSymbols.COLON {
 				this.markers.add(Marker(token, .SYNTAX, "Invalid Map - ':' expected"))
 			}
 
 			this.parseValue(visitor.visitValue())
 
 			token = this.tokens.lastReturned.next
-			token.ttype match
-			{
-				case BaseSymbols.COMMA
-				{
+			token.ttype match {
+				case BaseSymbols.COMMA {
 					this.tokens.next()
 					continue
 				}
-				case BaseSymbols.CLOSE_CURLY_BRACKET
-				{
+				case BaseSymbols.CLOSE_CURLY_BRACKET {
 					this.tokens.next()
 					visitor.visitEnd()
 					return
@@ -259,25 +215,20 @@ public class Parser
 		}
 	}
 
-	private func parseStringInterpolation(visitor: StringInterpolationVisitor) -> void
-	{
+	private func parseStringInterpolation(visitor: StringInterpolationVisitor) -> void {
 		var token = this.tokens.lastReturned
 		visitor.visitStringPart(token.stringValue)
 
-		while (this.tokens.hasNext())
-		{
+		while this.tokens.hasNext() {
 			this.parseValue(visitor.visitValue())
 
 			token = this.tokens.next()
-			token.ttype match
-			{
-				case Tokens.STRING_PART
-				{
+			token.ttype match {
+				case Tokens.STRING_PART {
 					visitor.visitStringPart(token.stringValue)
 					continue
 				}
-				case Tokens.STRING_END
-				{
+				case Tokens.STRING_END {
 					visitor.visitStringPart(token.stringValue)
 					visitor.visitEnd()
 					return
@@ -289,17 +240,14 @@ public class Parser
 		}
 	}
 
-	private func parseAccessSequence(visitor: ValueVisitor) -> void
-	{
+	private func parseAccessSequence(visitor: ValueVisitor) -> void {
 		var token = this.tokens.lastReturned()
-		while (token.next.ttype == BaseSymbols.DOT)
-		{
+		while token.next.ttype == BaseSymbols.DOT {
 			token = token.next.next
 		}
 
 		this.tokens.setNext(token.next())
-		while (token.prev.ttype == BaseSymbols.DOT)
-		{
+		while token.prev.ttype == BaseSymbols.DOT {
 			visitor = visitor.visitValueAccess(token.nameValue)
 
 			token = token.prev.prev
@@ -308,26 +256,21 @@ public class Parser
 		visitor.visitName(token.nameValue)
 	}
 
-	private func parseBuilder(visitor: BuilderVisitor) -> void
-	{
+	private func parseBuilder(visitor: BuilderVisitor) -> void {
 		// button = Button(text: 'Hello') { visible = false }
 
 		let token = this.tokens.next()
-		token.ttype match
-		{
-			case BaseSymbols.OPEN_PARENTHESIS
-			{
+		token.ttype match {
+			case BaseSymbols.OPEN_PARENTHESIS {
 				this.parseParameters(visitor)
-				if (this.tokens.lastReturned().next().ttype == BaseSymbols.OPEN_CURLY_BRACKET)
-				{
+				if this.tokens.lastReturned().next().ttype == BaseSymbols.OPEN_CURLY_BRACKET {
 					this.tokens.next()
 					this.parseBuilderNode(visitor)
 				}
 				visitor.visitEnd()
 				return
 			}
-			case BaseSymbols.OPEN_CURLY_BRACKET
-			{
+			case BaseSymbols.OPEN_CURLY_BRACKET {
 				this.parseBuilderNode(visitor)
 				visitor.visitEnd()
 			}
@@ -335,42 +278,34 @@ public class Parser
 		}
 	}
 
-	private func parseBuilderNode(visitor: BuilderVisitor) -> void
-	{
+	private func parseBuilderNode(visitor: BuilderVisitor) -> void {
 		this.parseNodeBody(visitor.visitNode())
 
 		let token = this.tokens.lastReturned()
-		if (token.ttype != BaseSymbols.CLOSE_CURLY_BRACKET)
-		{
+		if token.ttype != BaseSymbols.CLOSE_CURLY_BRACKET {
 			this.markers.add(Marker(token, .SYNTAX, "Invalid Builder - '}' expected"))
 		}
 	}
 
-	private func parseParameters(visitor: BuilderVisitor) -> void
-	{
+	private func parseParameters(visitor: BuilderVisitor) -> void {
 		var token = this.tokens.lastReturned().next()
-		if (token.ttype == BaseSymbols.CLOSE_PARENTHESIS)
-		{
+		if token.ttype == BaseSymbols.CLOSE_PARENTHESIS {
 			this.tokens.next()
 			return
 		}
 
-		while (this.tokens.hasNext())
-		{
-			if (token.next.ttype == BaseSymbols.COLON)
-			{
+		while this.tokens.hasNext() {
+			if token.next.ttype == BaseSymbols.COLON {
 				this.tokens.next()
 				this.tokens.next()
 				this.parseValue(visitor.visitParameter(token.nameValue))
 			}
-			else
-			{
+			else {
 				this.parseValue(visitor.visitParameter(null))
 			}
 
 			token = this.tokens.next()
-			match token.ttype
-			{
+			match token.ttype {
 				case BaseSymbols.CLOSE_PARENTHESIS: return
 				case BaseSymbols.COMMA | BaseSymbols.SEMICOLON: token = token.next()
 				case _ {}

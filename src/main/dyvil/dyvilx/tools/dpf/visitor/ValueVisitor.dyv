@@ -1,8 +1,7 @@
 package dyvilx.tools.dpf.visitor
 
 
-public interface ValueVisitor
-{
+public interface ValueVisitor {
 	func visitInt(value: int) -> void
 
 	func visitLong(value: long) -> void

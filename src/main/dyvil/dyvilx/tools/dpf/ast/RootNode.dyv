@@ -3,21 +3,17 @@ package dyvilx.tools.dpf.ast
 import dyvilx.tools.dpf.visitor.NodeVisitor
 import java.util.Map
 
-public class RootNode extends Node
-{
+public class RootNode extends Node {
 	public init() : super(Name('root'))
 
 	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor)
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> RootNode
-	{
-		if (mutate)
-		{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> RootNode {
+		if mutate {
 			this.expandChildren(mappings)
 			return this
 		}
-		else
-		{
+		else {
 			let node = new RootNode()
 			this.expand(node, mappings)
 			return node

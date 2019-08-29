@@ -20,8 +20,7 @@ import java.lang.reflect.Array
 @LiteralConvertible.FromStringInterpolation
 @LiteralConvertible.FromArray("apply(elements:)")
 @LiteralConvertible.FromMap("apply(entries:)")
-public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
-{
+public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value {
 	// Conversion Methods
 
 	implicit static final func apply(literal: int) -> IntValue = IntValue(literal)
@@ -59,32 +58,29 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value
 
 	// Value Conversions
 
-	static final func wrap(value: any!) -> Value
-	{
+	static final func wrap(value: any!) -> Value {
 		if let value = value as? Value { return value }
 
 		let valueClass = value.dynamicClass
 
-		if (valueClass === class String)  { return StringValue(value as String) }
-		if (valueClass === class Int)     { return IntValue(value as Int) }
-		if (valueClass === class Long)    { return LongValue(value as Long) }
-		if (valueClass === class Float)   { return FloatValue(value as Float) }
-		if (valueClass === class Double)  { return DoubleValue(value as Double) }
-		if (valueClass === class Name)    { return NameAccess(value as Name) }
-		if (valueClass === class Boolean) { return Value(value as boolean) }
+		if valueClass === class String  { return StringValue(value as String) }
+		if valueClass === class Int     { return IntValue(value as Int) }
+		if valueClass === class Long    { return LongValue(value as Long) }
+		if valueClass === class Float   { return FloatValue(value as Float) }
+		if valueClass === class Double  { return DoubleValue(value as Double) }
+		if valueClass === class Name    { return NameAccess(value as Name) }
+		if valueClass === class Boolean { return Value(value as boolean) }
 
 		if let conv = value as? DPFConvertible { return conv }
 		if let list = value as? List { return ListValue(list) }
 		if let map = value as? Map { return MapValue(map) }
 
-		if (value.getClass.isArray)
-		{
+		if value.getClass.isArray {
 			// Convert Arrays using Reflection
 			let size = Array.getLength(value)
 			let list = ArrayList<Value>(capacity: size)
 
-			for (i <- 0 ..< size)
-			{
+			for i <- 0 ..< size {
 				list.add(wrap(Array.get(value, i)))
 			}
 

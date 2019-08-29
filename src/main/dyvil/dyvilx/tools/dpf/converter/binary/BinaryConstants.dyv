@@ -1,7 +1,6 @@
 package dyvilx.tools.dpf.converter.binary
 
-public interface BinaryConstants
-{
+public interface BinaryConstants {
 	const END = 0
 
 	// Node Elements

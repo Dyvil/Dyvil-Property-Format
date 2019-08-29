@@ -4,8 +4,8 @@ import dyvilx.tools.dpf.visitor.ValueVisitor
 import dyvilx.tools.parsing.ASTNode
 import dyvilx.tools.parsing.lexer.StringLiterals
 
-case class StringValue(protected let value: String) implements Constant
-{
+case class StringValue(protected let value: String) implements Constant {
+
 	override func accept(visitor: ValueVisitor) -> void = visitor.visitString(this.value)
 
 	override func toObject() -> Object = this.value

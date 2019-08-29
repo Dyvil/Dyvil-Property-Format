@@ -8,23 +8,20 @@ import dyvilx.tools.parsing.ASTNode
 import java.util.Map
 import java.util.Objects
 
-class NameAccess
-(
+class NameAccess (
 	protected var value: Value? { public get; private set }
 	protected let name: Name { public get }
 )
-extends DPFValueVisitor implements Value, Expandable
-{
+extends DPFValueVisitor implements Value, Expandable {
+
 	static func apply(name: Name) -> NameAccess = new NameAccess(null, name)
 
 	static func apply(value: Value, name: Name) -> NameAccess = new NameAccess(value, name)
 
 	override func visitValue(value: Value) -> void = this.value = value
 
-	override func accept(visitor: ValueVisitor) -> void
-	{
-		if (this.value == null)
-		{
+	override func accept(visitor: ValueVisitor) -> void {
+		if this.value == null {
 			visitor.visitName(this.name)
 			return
 		}
@@ -32,13 +29,11 @@ extends DPFValueVisitor implements Value, Expandable
 		this.value!.accept(visitor.visitValueAccess(this.name))
 	}
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
-	{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object {
 		let builder = new StringBuilder()
 
 		var value = this.value
-		while (value is NameAccess)
-		{
+		while value is NameAccess {
 			let nameAccess = value as NameAccess
 			builder.insert(0, '.').insert(0, nameAccess.name)
 			value = nameAccess.value
@@ -50,10 +45,8 @@ extends DPFValueVisitor implements Value, Expandable
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
-		if let value = this.value
-		{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
+		if let value = this.value {
 			value.toString(indent, buffer)
 			buffer.append('.')
 		}

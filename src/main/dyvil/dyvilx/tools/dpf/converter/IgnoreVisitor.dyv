@@ -3,8 +3,8 @@ package dyvilx.tools.dpf.converter
 import dyvilx.tools.dpf.visitor._
 
 object IgnoreVisitor
-	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
-{
+	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor {
+
 	override func visitParameter(name: Name!) -> ValueVisitor = this
 
 	override func visitNode() -> NodeVisitor = this

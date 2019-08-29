@@ -9,13 +9,11 @@ import dyvil.source.position.SourcePosition
 
 import java.util.Map
 
-public class Property
-(
+public class Property (
 	protected let name:  Name   { public override get }
 	protected var _value: Value!
 )
-extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement
-{
+extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement {
 	var value: Value { override get: this._value!; set: this._value = newValue }
 
 	public init(name: Name) : this(name, null)
@@ -24,8 +22,7 @@ extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement
 
 	override func accept(visitor: NodeVisitor) -> void = this.value.accept(visitor.visitProperty(this.name))
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Property
-	{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Property {
 		let property = mutate ? this : new Property(this.name)
 		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return property
@@ -33,8 +30,7 @@ extends DPFValueVisitor implements dyvilx.tools.dpf.model.Property, NodeElement
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
 		buffer.append(this.name).append(" = ")
 		this.value.toString(indent, buffer)
 	}

@@ -4,7 +4,6 @@ import dyvilx.tools.dpf.visitor.NodeVisitor
 import dyvil.source.position.SourcePosition
 import dyvilx.tools.parsing.ASTNode
 
-interface NodeElement extends ASTNode, dyvilx.tools.dpf.model.NodeElement
-{
+interface NodeElement extends ASTNode, dyvilx.tools.dpf.model.NodeElement {
 	override var position: SourcePosition! { get: null; set {} }
 }

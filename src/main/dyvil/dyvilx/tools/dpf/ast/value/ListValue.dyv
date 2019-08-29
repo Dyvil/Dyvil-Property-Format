@@ -10,8 +10,8 @@ import java.util.function.UnaryOperator
 
 @LiteralConvertible.FromArray
 case class ListValue(protected let elements: List<Value> { public get })
-	implements Value, ListVisitor, Expandable
-{
+	implements Value, ListVisitor, Expandable {
+
 	static final func apply(elements: Value...) -> ListValue = ListValue(ArrayList(elements...))
 
 	// Visitor
@@ -20,12 +20,10 @@ case class ListValue(protected let elements: List<Value> { public get })
 		override func visitValue(value: Value) -> void = this<ListValue>.elements.add(value)
 	}
 
-	override func accept(visitor: ValueVisitor)
-	{
+	override func accept(visitor: ValueVisitor) {
 		let listVisitor = visitor.visitList()
 
-		for (element <- this.elements)
-		{
+		for element <- this.elements {
 			element.accept(listVisitor.visitElement())
 		}
 
@@ -34,8 +32,7 @@ case class ListValue(protected let elements: List<Value> { public get })
 
 	// Expandable
 
-	override func expand(mappings: Map<String, Object>, mutate: boolean) -> ListValue
-	{
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> ListValue {
 		let expanded = this.elements.expand(mappings, mutate) as List<Value>
 		return expanded === this.elements ? this : new ListValue(expanded)
 	}
@@ -44,19 +41,16 @@ case class ListValue(protected let elements: List<Value> { public get })
 
 	override func toString() -> String = format(this)
 
-	override func toString(indent: String, buffer: StringBuilder) -> void
-	{
+	override func toString(indent: String, buffer: StringBuilder) -> void {
 		let len = this.elements.size
-		if (len <= 0)
-		{
+		if len <= 0 {
 			buffer.append('[]')
 			return
 		}
 
 		buffer.append('[ ')
 		this.elements[0].toString(indent, buffer)
-		for (i <- 1 ..< len)
-		{
+		for i <- 1 ..< len {
 			buffer.append(', ')
 			this.elements[i].toString(indent, buffer)
 		}

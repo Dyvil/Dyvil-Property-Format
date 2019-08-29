@@ -1,7 +1,6 @@
 package dyvilx.tools.dpf.visitor
 
-interface MapVisitor
-{
+interface MapVisitor {
 	func visitKey() -> ValueVisitor
 
 	func visitValue() -> ValueVisitor

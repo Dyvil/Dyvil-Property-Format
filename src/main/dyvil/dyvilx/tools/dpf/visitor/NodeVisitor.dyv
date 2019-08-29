@@ -1,8 +1,7 @@
 package dyvilx.tools.dpf.visitor
 
 
-interface NodeVisitor
-{
+interface NodeVisitor {
 	func visitNode(name: Name) -> NodeVisitor
 
 	func visitProperty(name: Name) -> ValueVisitor

@@ -7,14 +7,11 @@ import java.io.IOException
 
 using dyvilx.tools.dpf.converter.binary.BinaryConstants._
 
-class BinaryReader(private let dataInput: DataInput)
-{
+class BinaryReader(private let dataInput: DataInput) {
 	func readValue(visitor: ValueVisitor) -> void throws IOException = this.readValue(this.dataInput.readByte(), visitor)
 
-	private func readValue(tag: int, visitor: ValueVisitor) -> void throws IOException
-	{
-		match (tag)
-		{
+	private func readValue(tag: int, visitor: ValueVisitor) -> void throws IOException {
+		match (tag) {
 			case BOOLEAN | BYTE | SHORT | CHAR | INT {
 				visitor.visitInt(this.dataInput.readInt())
 				return
@@ -62,14 +59,11 @@ class BinaryReader(private let dataInput: DataInput)
 		}
 	}
 
-	private func readStringInterpolation(visitor: StringInterpolationVisitor) -> void throws IOException
-	{
-		while (true)
-		{
+	private func readStringInterpolation(visitor: StringInterpolationVisitor) -> void throws IOException {
+		while true {
 			visitor.visitStringPart(this.dataInput.readUTF())
 			let tag = this.dataInput.readByte()
-			if (tag == END)
-			{
+			if tag == END {
 				visitor.visitEnd()
 				return
 			}
@@ -77,13 +71,10 @@ class BinaryReader(private let dataInput: DataInput)
 		}
 	}
 
-	private func readList(visitor: ListVisitor) -> void throws IOException
-	{
-		while (true)
-		{
+	private func readList(visitor: ListVisitor) -> void throws IOException {
+		while true {
 			let tag = this.dataInput.readByte()
-			if (tag == END)
-			{
+			if tag == END {
 				visitor.visitEnd()
 				return
 			}
@@ -91,13 +82,10 @@ class BinaryReader(private let dataInput: DataInput)
 		}
 	}
 
-	private func readMap(visitor: MapVisitor) -> void throws IOException
-	{
-		while (true)
-		{
+	private func readMap(visitor: MapVisitor) -> void throws IOException {
+		while true {
 			let tag = this.dataInput.readByte()
-			if (tag == END)
-			{
+			if tag == END {
 				visitor.visitEnd()
 				return
 			}
@@ -107,15 +95,12 @@ class BinaryReader(private let dataInput: DataInput)
 		}
 	}
 
-	private func readBuilder(visitor: BuilderVisitor) -> void throws IOException
-	{
-		while (true)
-		{
+	private func readBuilder(visitor: BuilderVisitor) -> void throws IOException {
+		while true {
 			let paramName = Name.read(this.dataInput)
 			let tag = this.dataInput.readByte()
 
-			if (tag == END)
-			{
+			if tag == END {
 				this.readNodes(visitor.visitNode())
 				visitor.visitEnd()
 				this.dataInput.readByte() // consume the builder end 0
@@ -126,13 +111,10 @@ class BinaryReader(private let dataInput: DataInput)
 		}
 	}
 
-	func readNodes(visitor: NodeVisitor) -> void throws IOException
-	{
-		while (true)
-		{
+	func readNodes(visitor: NodeVisitor) -> void throws IOException {
+		while true {
 			let tag = this.dataInput.readByte()
-			if (tag == END)
-			{
+			if tag == END {
 				visitor.visitEnd()
 				return
 			}
@@ -142,10 +124,8 @@ class BinaryReader(private let dataInput: DataInput)
 
 	func readNode(visitor: NodeVisitor) -> void throws IOException = this.readNode(this.dataInput.readByte(), visitor)
 
-	private func readNode(tag: int, visitor: NodeVisitor) -> void throws IOException
-	{
-		match (tag)
-		{
+	private func readNode(tag: int, visitor: NodeVisitor) -> void throws IOException {
+		match (tag) {
 			case NODE {
 				this.readNodes(visitor.visitNode(Name.read(this.dataInput)))
 				//           ^ note the s
