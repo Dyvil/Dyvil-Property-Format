@@ -40,7 +40,7 @@ extends DPFValueVisitor implements Value, Expandable {
 		}
 
 		builder.append(this.name)
-		return mappings[builder.toString()] ?? this
+		return Optional(mappings[builder.toString()]) ?? this
 	}
 
 	override func toString() -> String = format(this)

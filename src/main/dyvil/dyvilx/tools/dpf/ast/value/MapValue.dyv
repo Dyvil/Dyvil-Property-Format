@@ -66,8 +66,8 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 			return
 		}
 
-		let keys = this.entries.keySet.toArray([Value](0)) as [Value]
-		let values = this.entries.values.toArray([Value](0)) as [Value]
+		let keys = this.entries.keySet.toArray(new [Value](0))
+		let values = this.entries.values.toArray(new [Value](0))
 
 		let innerIndent = indent + '\t'
 
