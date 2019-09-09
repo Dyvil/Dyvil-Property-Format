@@ -7,7 +7,8 @@ import dyvilx.tools.dpf.visitor.ValueVisitor
 import dyvilx.tools.parsing.ASTNode
 import dyvil.source.position.SourcePosition
 
-import java.util.{ List, ArrayList, Map }
+import java.util.{ List, ArrayList, Map, LinkedHashMap }
+import java.util.stream.Collectors
 import java.lang.reflect.Array
 
 @LiteralConvertible.FromInt
@@ -72,10 +73,20 @@ public interface Value extends ASTNode, dyvilx.tools.dpf.model.value.Value {
 		if valueClass === class Boolean { return Value(value as boolean) }
 
 		if let conv = value as? DPFConvertible { return conv }
-		if let list = value as? List { return ListValue(list) }
-		if let map = value as? Map { return MapValue(map) }
 
-		if value.getClass.isArray {
+		if let list = value as? List {
+			return ListValue(list.stream().map(wrap _).collect(Collectors.toList<Value>()))
+		}
+
+		if let map = value as? Map {
+			let valueMap = new LinkedHashMap<Value, Value>(map.size())
+			for entry <- map.entrySet() {
+				valueMap.put(wrap(entry.getKey()), wrap(entry.getValue()))
+			}
+			return MapValue(valueMap)
+		}
+
+		if valueClass.isArray {
 			// Convert Arrays using Reflection
 			let size = Array.getLength(value)
 			let list = ArrayList<Value>(capacity: size)
