@@ -1,23 +1,29 @@
 package dyvilx.tools.dpf.model
 
-import java.util.{ List, Map }
+import java.util.{ List, Map, LinkedHashMap }
 import java.util.stream.Collectors
-import java.util.function.UnaryOperator
 
 interface Expandable {
-	func expand(mappings: Map<String, Object>) -> void = this.expand(mappings, true)
+	func expand(mappings: Map<String, Object>) -> Object = this.expand(mappings, true)
 
 	func expanded(mappings: Map<String, Object>) -> Object = this.expand(mappings, false)
 
 	func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
 
-	static func expand(obj: Object, mappings: Map<String, Object>, mutate: boolean) -> Object
-		= obj.expand(mappings, mutate)
+	static func expand(obj: Object, mappings: Map<String, Object>, mutate: boolean) -> Object {
+		obj match {
+			case var exp: Expandable => exp.expand(mappings, mutate)
+			case var lst: List<_>    => lst.expand(mappings, mutate)
+			case var map: Map<_, _>  => map.expand(mappings, mutate)
+			case _ => obj
+		}
+	}
 }
 
+@JavaName("ExpandableObjects")
 extension Object {
-	final func expand(mappings: Map<String, Object>) -> void {
-		this.expand(mappings, true)
+	final func expand(mappings: Map<String, Object>) -> Object {
+		return this.expand(mappings, true)
 	}
 
 	final func expanded(mappings: Map<String, Object>) -> Object {
@@ -25,66 +31,66 @@ extension Object {
 	}
 
 	func expand(mappings: Map<String, Object>, mutate: boolean) -> Object {
-		this match {
-			case var exp: Expandable => exp.expand(mappings, mutate)
-			case var lst: List<_>    => lst.expand(mappings, mutate)
-			case var map: Map<_, _>  => map.expand(mappings, mutate)
-			case _ => this
-		}
+		// implementation resides in Expandable.expand because of a bug with
+		// extension method overload resolution
+		return Expandable.expand(this, mappings, mutate)
 	}
 }
 
+@JavaName("ExpandableMaps")
 extension Map<_, _> {
-	final func expand(mappings: Map<String, Object>) -> void {
-		let expanded = this.expanded(mappings)
-		this.clear()
-		this.putAll(expanded)
+	final func expand(mappings: Map<String, Object>) -> Map<_, _> {
+		try {
+			let copy = new LinkedHashMap(this)
+			this.clear()
+
+			for entry <- copy.entrySet() {
+				let key = entry.getKey().expand(mappings)
+				let value = entry.getValue().expand(mappings)
+				this.put(key, value)
+			}
+
+			return this
+		}
+		catch ex: UnsupportedOperationException {
+			return this.expanded(mappings)
+		}
 	}
 
 	final func expanded(mappings: Map<String, Object>) -> Map<_, _> {
-		return this.entrySet.stream()
-		                    .map(e => (e.getKey().expand(mappings, false), e.getValue().expand(mappings, false)))
-		                    .collect(Collectors.toMap<(Object, Object), Object, Object>(_._1, _._2))
+		let result = new LinkedHashMap<Object, Object>(this.size())
+
+		for entry <- this.entrySet() {
+			let key = entry.getKey().expanded(mappings)
+			let value = entry.getValue().expanded(mappings)
+			result.put(key, value)
+		}
+
+		return result
 	}
 
 	final func expand(mappings: Map<String, Object>, mutate: boolean) -> Map<_, _> {
-		let expanded = this.expanded(mappings)
-		if !mutate {
-			return expanded
-		}
-
-		try {
-			this.clear()
-			this.putAll(expanded)
-			return this
-		}
-		catch ex: UnsupportedOperationException {
-			return expanded
-		}
+		return mutate ? this.expand(mappings) : this.expanded(mappings)
 	}
 }
 
+@JavaName("ExpandableLists")
 extension List<_> {
-	final func expand(mappings: Map<String, Object>) -> void {
-		// TODO replace with lambda
-		this.replaceAll(new UnaryOperator<any!> { override func apply(o: any!) -> any! = o.expand(mappings) })
-	}
-
-	final func expanded(mappings: Map<String, Object>) -> List<_> {
-		return this.stream.map(_.expand(mappings, true)).collect(Collectors.toList<Object>())
-	}
-
-	final func expand(mappings: Map<String, Object>, mutate: boolean) -> List<_> {
-		if !mutate {
-			return this.expanded(mappings)
-		}
-
+	final func expand(mappings: Map<String, Object>) -> List<_> {
 		try {
-			this.expand(mappings)
+			this.replaceAll(_.expand(mappings))
 			return this
 		}
 		catch ex: UnsupportedOperationException {
 			return this.expanded(mappings)
 		}
+	}
+
+	final func expanded(mappings: Map<String, Object>) -> List<_> {
+		return this.stream.map(_.expanded(mappings)).collect(Collectors.toList<Object>())
+	}
+
+	final func expand(mappings: Map<String, Object>, mutate: boolean) -> List<_> {
+		return mutate ? this.expand(mappings) : this.expanded(mappings)
 	}
 }
